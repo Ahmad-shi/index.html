@@ -1,59 +1,67 @@
 <!DOCTYPE html>
-<html lang="UTF-8">
+<html lang="ar">
 <head>
-   
-    <title>ال القلقيلي</title>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول</title>
 </head>
 <body bgcolor="#FFFBEA">
-<form id="myForm" onsubmit="event.preventDefault(); check();">
-  <fieldset>
-    <legend>login</legend> <div> <label for="text">user name</label>
- <input id="username" type="text" placeholder="القلقيلي - - -" required></div>
- <div><label for="pass">password</label>
-  <input id="pass" type="password" required></div>
-  <div>
-    <input type="submit">
-  </div></fieldset>
- 
- 
-</form>
 
-<table border="1" id="myTable" width="500" height="500" style="display: none;" >
-<tr>
-    <th>الاسم</th>
-    <th>اخر شهر دفع</th>
-    <th>عدد الشهور </th>
-</tr>
-<tr>
+    <!-- نموذج الدخول -->
+    <form id="myForm">
+        <fieldset>
+            <legend>login</legend>
+            <div>
+                <label for="username">user name</label>
+                <input id="username" type="text" placeholder="اسم المستخدم" required>
+            </div>
+            <br>
+            <div>
+                <label for="pass">password</label>
+                <input id="pass" type="password" required>
+            </div>
+            <br>
+            <div>
+                <button type="button" onclick="check()">دخول</button>
+            </div>
+        </fieldset>
+    </form>
 
-</tr>
-<tr>
- <td>محمود سليمان القلقيلي</td> 
-   <td>12/4/2026</td> 
-     <td>4</td>   
-</tr>
-<tr>
-   <td>محمد سليمان القلقيلي</td>
-     <td>26/6/2026</td> 
-    <td>2</td>  
-</tr>
-<tr>
-      <td>احمد القلقيلي </td>
-        <td>2/7/2026</td> 
-        <td>1</td>  
-</tr>
-</table>
-<script>
- function check() {
-var u = document.getElementById("username").value;
-var p = document.getElementById("pass").value;
+    <!-- واجهة الأدمن -->
+    <div id="adminView" style="display: none;">
+        <h3>صفحة الأدمن</h3>
+        <table border="1" width="400">
+            <tr><th>الاسم</th><th>الحالة</th></tr>
+            <tr><td>محمود سليمان القليلي</td><td>أدمن</td></tr>
+        </table>
+    </div>
 
-if (u === "admin" && p === "1234") {
-document.getElementById("myForm").style.display = "none"; // إخفاء اللوجن
-document.getElementById("myTable").style.display = "table"; // إظهار الجدول
-} else {
-alert("البيانات خطأ!");
-}
-}
-</script>
+    <!-- واجهة المستخدم -->
+    <div id="userView" style="display: none;">
+        <h3>صفحة المستخدم</h3>
+        <table border="1" width="400">
+            <tr><th>الاسم</th><th>الحالة</th></tr>
+            <tr><td>مستخدم عادي</td><td>مستفيد</td></tr>
+        </table>
+    </div>
+
+    <script>
+        function check() {
+            var u = document.getElementById("username").value.trim();
+            var p = document.getElementById("pass").value.trim();
+
+            if (u === "admin" && p === "1234") {
+                document.getElementById("myForm").style.display = "none";
+                document.getElementById("adminView").style.display = "block";
+                document.getElementById("userView").style.display = "none";
+            } else if (u === "user" && p === "1122") {
+                document.getElementById("myForm").style.display = "none";
+                document.getElementById("userView").style.display = "block";
+                document.getElementById("adminView").style.display = "none";
+            } else {
+                alert("البيانات غير صحيحة!");
+            }
+        }
+    </script>
+
 </body>
+</html>
