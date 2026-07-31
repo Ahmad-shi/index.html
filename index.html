@@ -2,258 +2,286 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام إدارة البيانات</title>
+    <title>نظام إدارة البيانات الكامل</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #FFFBEA; }
+        fieldset { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        button { padding: 6px 12px; cursor: pointer; border-radius: 4px; border: none; }
+        .btn-main { background-color: #28a745; color: white; }
+        .btn-edit { background-color: #ffc107; color: black; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        .btn-cancel { background-color: #6c757d; color: white; }
+        input[type="text"], input[type="password"], input[type="number"] { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
 </head>
-<body bgcolor="#FFFBEA" style="font-family: Arial, sans-serif; padding: 20px;">
+<body>
 
-    <!-- 1. نموذج الدخول -->
-    <form id="myForm">
-        <fieldset style="width: 300px; margin: 30px auto; background: #fff; padding: 15px;">
+    <!-- 1. شاشة تسجيل الدخول -->
+    <div id="loginSection" style="width: 320px; margin: 50px auto;">
+        <fieldset>
             <legend><b>تسجيل الدخول</b></legend>
-            <div>
-                <label for="username">اسم المستخدم</label> <br>
-                <input id="username" type="text" placeholder="اسم المستخدم" required style="width: 90%;">
+            <div style="margin-bottom: 10px;">
+                <label>اسم المستخدم:</label><br>
+                <input type="text" id="username" style="width: 95%;">
             </div>
-            <br>
-            <div>
-                <label for="pass">كلمة السر</label> <br>
-                <input id="pass" type="password" required style="width: 90%;">
+            <div style="margin-bottom: 10px;">
+                <label>كلمة السر:</label><br>
+                <input type="password" id="pass" style="width: 95%;">
             </div>
-            <br>
-            <div>
-                <button type="button" onclick="check()">دخول</button>
-            </div>
+            <button class="btn-main" onclick="login()">دخول</button>
         </fieldset>
-    </form>
+    </div>
 
     <!-- 2. واجهة الأدمن -->
     <div id="adminView" style="display: none;">
-        <h3>صفحة الأدمن (إضافة وتعديل وحذف)</h3>
-        
-        <fieldset style="width: 400px; margin-bottom: 20px; background: #fff; padding: 15px;">
-            <legend id="formTitle"><b>إضافة / تعديل مشترك</b></legend>
-            
-            <input type="hidden" id="editKey" value=""> 
-            
-            <label>الاسم الكامل:</label><br>
-            <input type="text" id="newName" placeholder="الاسم الكامل" style="width: 90%;"><br><br>
-            
-            <label>آخر شهر دفع:</label><br>
-            <input type="text" id="newDate" placeholder="مثال: 12/4/2026" style="width: 90%;"><br><br>
-            
-            <label>عدد الشهور:</label><br>
-            <input type="number" id="newMonths" placeholder="عدد الشهور" style="width: 90%;"><br><br>
-            
-            <button type="button" id="saveBtn" onclick="saveData()">حفظ البيانات</button>
-            <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">إلغاء التعديل</button>
+        <h2>لوحة تحكم الأدمن (تحكم كامل)</h2>
+
+        <!-- قسم إضافة عمود جديد -->
+        <fieldset style="background: #eef7ff;">
+            <legend><b>➕ إضافة عمود جديد للجدول</b></legend>
+            <input type="text" id="newColInput" placeholder="اسم العمود الجديد (مثلاً: رقم الهاتف)" style="width: 250px;">
+            <button class="btn-main" onclick="addNewColumn()">إضافة العمود</button>
         </fieldset>
 
-        <h3>جدول بيانات المشتركين</h3>
-        <table border="1" cellpadding="8" cellspacing="0" width="100%" style="background: #fff;">
+        <!-- قسم إضافة / تعديل مشترك (صفوف) -->
+        <fieldset>
+            <legend id="formTitle"><b>➕ إضافة / تعديل صف</b></legend>
+            <input type="hidden" id="editRowIndex" value="-1">
+            
+            <div id="dynamicFieldsContainer">
+                <!-- تتولد خانات الإدخال هنا تلقائياً حسب الأعمدة -->
+            </div>
+            <br>
+            <button class="btn-main" id="saveBtn" onclick="saveRowData()">حفظ الصف</button>
+            <button class="btn-cancel" id="cancelBtn" onclick="resetRowForm()" style="display: none;">إلغاء التعديل</button>
+        </fieldset>
+
+        <h3>جدول البيانات (الأدمن)</h3>
+        <table>
             <thead>
-                <tr bgcolor="#ddd">
-                    <th>الاسم</th>
-                    <th>آخر شهر دفع</th>
-                    <th>عدد الشهور</th>
-                </tr>
-                <tr>
-                    <th>ll</th>
-                    <th>22/6/2026</th>
-                    <th>2</th>
-                </tr>
+                <tr id="adminHeaderRow"></tr>
             </thead>
-            <tbody id="adminTableBody">
-                <!-- تحميل البيانات تلقائياً من Firebase -->
-            </tbody>
+            <tbody id="adminTableBody"></tbody>
         </table>
         <br>
-        <button onclick="logout()">تسجيل الخروج</button>
+        <button class="btn-cancel" onclick="logout()">تسجيل الخروج</button>
     </div>
 
     <!-- 3. واجهة المستخدم -->
     <div id="userView" style="display: none;">
-        <h3>صفحة المشتركين (عرض فقط)</h3>
-        <table border="1" width="100%" cellpadding="8" cellspacing="0" style="background: #fff;">
+        <h2>صفحة عرض البيانات (المستخدم)</h2>
+        <table>
             <thead>
-                <tr bgcolor="#eee">
-                    <th>الاسم</th>
-                    <th>آخر شهر دفع</th>
-                    <th>عدد الشهور</th>
-                </tr>
+                <tr id="userHeaderRow"></tr>
             </thead>
-            <tbody id="userTableBody">
-                <!-- تحميل البيانات من Firebase -->
-            </tbody>
+            <tbody id="userTableBody"></tbody>
         </table>
         <br>
-        <button onclick="logout()">تسجيل الخروج</button>
+        <button class="btn-cancel" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- 4. مكتبات Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <script>
-        // ⚠️ استبدل المفاتيح ببيانات مشروعك من Firebase Console
-        const firebaseConfig = {
-            apiKey: "ضع_الـ_apiKey_هنا",
-            authDomain: "PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "PROJECT_ID",
-            storageBucket: "PROJECT_ID.appspot.com",
-            messagingSenderId: "XXXXX",
-            appId: "XXXXX"
-        };
+        // إعدادات البيانات الأولية في المتصفح
+        let columns = JSON.parse(localStorage.getItem('my_columns')) || ["الاسم", "آخر شهر دفع", "عدد الشهور"];
+        let rows = JSON.parse(localStorage.getItem('my_rows')) || [
+            {"الاسم": "أحمد محمود", "آخر شهر دفع": "04/2026", "عدد الشهور": "3"},
+            {"الاسم": "محمد علي", "آخر شهر دفع": "05/2026", "عدد الشهور": "1"}
+        ];
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        // حفظ الحالات في التخزين المحلي
+        function syncStorage() {
+            localStorage.setItem('my_columns', JSON.stringify(columns));
+            localStorage.setItem('my_rows', JSON.stringify(rows));
+        }
 
-        function check() {
-            var u = document.getElementById("username").value.trim();
-            var p = document.getElementById("pass").value.trim();
+        // تسجيل الدخول
+        function login() {
+            let u = document.getElementById("username").value.trim();
+            let p = document.getElementById("pass").value.trim();
 
             if (u === "admin" && p === "1234") {
-                document.getElementById("myForm").style.display = "none";
+                document.getElementById("loginSection").style.display = "none";
                 document.getElementById("adminView").style.display = "block";
-                loadAdminData();
+                renderAdminUI();
             } else if (u === "user" && p === "1122") {
-                document.getElementById("myForm").style.display = "none";
+                document.getElementById("loginSection").style.display = "none";
                 document.getElementById("userView").style.display = "block";
-                loadUserData();
+                renderUserUI();
             } else {
-                alert("بيانات الدخول غير صحيحة!");
+                alert("اسم المستخدم أو كلمة السر غير صحيحة!");
             }
         }
 
-        // --- دالة الحفظ (إضافة جديدة أوتعديل سطر قائم) ---
-        function saveData() {
-            var key = document.getElementById("editKey").value;
-            var name = document.getElementById("newName").value.trim();
-            var date = document.getElementById("newDate").value.trim();
-            var months = document.getElementById("newMonths").value.trim();
+        // --- 1. بناء واجهة الأدمن ---
+        function renderAdminUI() {
+            renderFormFields();
+            renderAdminTable();
+        }
 
-            if (!name || !date || !months) {
+        // توليد خانات الإدخال بناءً على الأعمدة الموجودة
+        function renderFormFields() {
+            let container = document.getElementById("dynamicFieldsContainer");
+            container.innerHTML = "";
+            columns.forEach(col => {
+                container.innerHTML += `
+                    <div style="margin-bottom: 8px;">
+                        <label><b>${col}:</b></label><br>
+                        <input type="text" id="field_${col}" placeholder="أدخل ${col}" style="width: 90%;">
+                    </div>
+                `;
+            });
+        }
+
+        // إضافة عمود جديد
+        function addNewColumn() {
+            let colName = document.getElementById("newColInput").value.trim();
+            if (!colName) {
+                alert("يرجى كتابة اسم العمود!");
+                return;
+            }
+            if (columns.includes(colName)) {
+                alert("هذا العمود موجود بالفعل!");
+                return;
+            }
+
+            columns.push(colName);
+            // إعطاء قيمة فارغة للعمود الجديد في الصفوف القديمة
+            rows.forEach(r => { if (!r[colName]) r[colName] = "-"; });
+
+            syncStorage();
+            document.getElementById("newColInput").value = "";
+            renderAdminUI();
+            alert("تمت إضافة العمود بنجاح!");
+        }
+
+        // حفظ صف (إضافة جديدة أو تعديل)
+        function saveRowData() {
+            let index = parseInt(document.getElementById("editRowIndex").value);
+            let rowData = {};
+            let isComplete = true;
+
+            columns.forEach(col => {
+                let val = document.getElementById(`field_${col}`).value.trim();
+                if (!val) isComplete = false;
+                rowData[col] = val;
+            });
+
+            if (!isComplete) {
                 alert("يرجى تعبئة جميع الخانات!");
                 return;
             }
 
-            var itemData = { name: name, date: date, months: months };
-
-            if (key !== "") {
-                // تعديل مباشر بالـ key
-                database.ref('subscribers/' + key).update(itemData, function(error) {
-                    if (error) {
-                        alert("حدث خطأ أثناء التعديل: " + error.message);
-                    } else {
-                        alert("تم تعديل البيانات بنجاح!");
-                        resetForm();
-                    }
-                });
+            if (index >= 0) {
+                // تعديل صف قائم
+                rows[index] = rowData;
+                alert("تم تعديل البيانات بنجاح!");
             } else {
-                // إضافة جديدة
-                database.ref('subscribers/').push(itemData, function(error) {
-                    if (error) {
-                        alert("حدث خطأ أثناء الإضافة: " + error.message);
-                    } else {
-                        alert("تمت الإضافة بنجاح!");
-                        resetForm();
-                    }
-                });
+                // إضافة صف جديد
+                rows.push(rowData);
+                alert("تمت إضافة الصف بنجاح!");
             }
+
+            syncStorage();
+            resetRowForm();
+            renderAdminTable();
         }
 
-        // --- دالة جلب بيانات سطر محدد وتعبئتها في الخانات فوق للتعديل ---
-        function prepareEdit(key) {
-            database.ref('subscribers/' + key).once('value').then((snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    document.getElementById("editKey").value = key;
-                    document.getElementById("newName").value = data.name;
-                    document.getElementById("newDate").value = data.date;
-                    document.getElementById("newMonths").value = data.months;
+        // تجهيز بيانات الصف للتعديل
+        function startEditRow(index) {
+            document.getElementById("editRowIndex").value = index;
+            let targetRow = rows[index];
 
-                    document.getElementById("formTitle").innerHTML = "<b>تعديل بيانات: " + data.name + "</b>";
-                    document.getElementById("saveBtn").innerText = "حفظ التعديلات";
-                    document.getElementById("cancelBtn").style.display = "inline-block";
-                    
-                    // التمرير لأعلى الصفحة للتركيز على الخانات
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
+            columns.forEach(col => {
+                document.getElementById(`field_${col}`).value = targetRow[col] || '';
             });
+
+            document.getElementById("formTitle").innerHTML = "<b>✏️ تعديل الصف رقم (" + (index + 1) + ")</b>";
+            document.getElementById("saveBtn").innerText = "حفظ التعديلات";
+            document.getElementById("cancelBtn").style.display = "inline-block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- دالة الحذف ---
-        function deleteRow(key) {
-            if (confirm("هل أنت متأكد من الحذف؟")) {
-                database.ref('subscribers/' + key).remove();
+        // حذف صف
+        function deleteRow(index) {
+            if (confirm("هل أنت متأكد من حذف هذا الصف؟")) {
+                rows.splice(index, 1);
+                syncStorage();
+                renderAdminTable();
             }
         }
 
-        // --- تفريغ الخانات ---
-        function resetForm() {
-            document.getElementById("editKey").value = "";
-            document.getElementById("newName").value = "";
-            document.getElementById("newDate").value = "";
-            document.getElementById("newMonths").value = "";
-
-            document.getElementById("formTitle").innerHTML = "<b>إضافة / تعديل مشترك</b>";
-            document.getElementById("saveBtn").innerText = "حفظ البيانات";
+        // إغلاق نموذج التعديل ورجوعه للإضافة
+        function resetRowForm() {
+            document.getElementById("editRowIndex").value = "-1";
+            columns.forEach(col => {
+                let field = document.getElementById(`field_${col}`);
+                if (field) field.value = "";
+            });
+            document.getElementById("formTitle").innerHTML = "<b>➕ إضافة / تعديل صف</b>";
+            document.getElementById("saveBtn").innerText = "حفظ الصف";
             document.getElementById("cancelBtn").style.display = "none";
         }
 
-        // --- تحميل جدول الأدمن ---
-        function loadAdminData() {
-            database.ref('subscribers/').on('value', (snapshot) => {
-                const tbody = document.getElementById("adminTableBody");
-                tbody.innerHTML = "";
+        // رسم جدول الأدمن
+        function renderAdminTable() {
+            let header = document.getElementById("adminHeaderRow");
+            let tbody = document.getElementById("adminTableBody");
 
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const key = childSnapshot.key;
-                        const data = childSnapshot.val();
+            header.innerHTML = "";
+            columns.forEach(col => { header.innerHTML += `<th>${col}</th>`; });
+            header.innerHTML += `<th>التحكم</th>`;
 
-                        tbody.innerHTML += `<tr>
-                            <td><b>${data.name}</b></td>
-                            <td>${data.date}</td>
-                            <td>${data.months}</td>
-                            <td>
-                                <button type="button" onclick="prepareEdit('${key}')">تعديل ✏️</button>
-                                <button type="button" onclick="deleteRow('${key}')">حذف ❌</button>
-                            </td>
-                        </tr>`;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="4">لا توجد بيانات حالياً</td></tr>`;
-                }
+            tbody.innerHTML = "";
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${columns.length + 1}">لا توجد بيانات حالياً</td></tr>`;
+                return;
+            }
+
+            rows.forEach((row, i) => {
+                let tr = "<tr>";
+                columns.forEach(col => {
+                    tr += `<td>${row[col] || '-'}</td>`;
+                });
+                tr += `<td>
+                    <button class="btn-edit" onclick="startEditRow(${i})">تعديل ✏️</button>
+                    <button class="btn-delete" onclick="deleteRow(${i})">حذف ❌</button>
+                </td></tr>`;
+                tbody.innerHTML += tr;
             });
         }
 
-        // --- تحميل جدول المستخدم ---
-        function loadUserData() {
-            database.ref('subscribers/').on('value', (snapshot) => {
-                const tbody = document.getElementById("userTableBody");
-                tbody.innerHTML = "";
+        // --- 2. بناء واجهة المستخدم ---
+        function renderUserUI() {
+            let header = document.getElementById("userHeaderRow");
+            let tbody = document.getElementById("userTableBody");
 
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const data = childSnapshot.val();
-                        tbody.innerHTML += `<tr>
-                            <td><b>${data.name}</b></td>
-                            <td>${data.date}</td>
-                            <td>${data.months}</td>
-                        </tr>`;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات حالياً</td></tr>`;
-                }
+            header.innerHTML = "";
+            columns.forEach(col => { header.innerHTML += `<th>${col}</th>`; });
+
+            tbody.innerHTML = "";
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${columns.length}">لا توجد بيانات حالياً</td></tr>`;
+                return;
+            }
+
+            rows.forEach(row => {
+                let tr = "<tr>";
+                columns.forEach(col => {
+                    tr += `<td>${row[col] || '-'}</td>`;
+                });
+                tr += "</tr>";
+                tbody.innerHTML += tr;
             });
         }
 
-        // --- تسجيل الخروج ---
+        // تسجيل الخروج
         function logout() {
             document.getElementById("adminView").style.display = "none";
             document.getElementById("userView").style.display = "none";
-            document.getElementById("myForm").style.display = "block";
+            document.getElementById("loginSection").style.display = "block";
             document.getElementById("username").value = "";
             document.getElementById("pass").value = "";
         }
