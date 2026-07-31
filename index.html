@@ -2,21 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل الدخول</title>
+    <title>نظام إدارة البيانات</title>
 </head>
 <body bgcolor="#FFFBEA" style="font-family: Arial, sans-serif; padding: 20px;">
 
-    <!-- نموذج الدخول -->
+    <!-- 1. نموذج الدخول -->
     <form id="myForm">
         <fieldset style="width: 300px; margin: 30px auto; background: #fff; padding: 15px;">
-            <legend>login</legend>
+            <legend><b>تسجيل الدخول</b></legend>
             <div>
-                <label for="username">user name</label> <br>
+                <label for="username">اسم المستخدم</label> <br>
                 <input id="username" type="text" placeholder="اسم المستخدم" required style="width: 90%;">
             </div>
             <br>
             <div>
-                <label for="pass">password</label> <br>
+                <label for="pass">كلمة السر</label> <br>
                 <input id="pass" type="password" required style="width: 90%;">
             </div>
             <br>
@@ -26,47 +26,53 @@
         </fieldset>
     </form>
 
-    <!-- واجهة الأدمن -->
+    <!-- 2. واجهة الأدمن -->
     <div id="adminView" style="display: none;">
-        <h3>صفحة الأدمن</h3>
-        <fieldset style="width: 400px; margin-bottom: 20px; background: #fff;">
-            <legend id="formTitle">إضافة / تعديل مشترك</legend>
+        <h3>صفحة الأدمن (إضافة وتعديل وحذف)</h3>
+        
+        <fieldset style="width: 400px; margin-bottom: 20px; background: #fff; padding: 15px;">
+            <legend id="formTitle"><b>إضافة / تعديل مشترك</b></legend>
             
-            <!-- معرف سري للسطر الجاري تعديله -->
-            <input type="hidden" id="editKey"> 
+            <input type="hidden" id="editKey" value=""> 
             
-            <input type="text" id="newName" placeholder="الاسم الكامل" required> <br><br>
-            <input type="text" id="newDate" placeholder="آخر شهر دفع (مثال: 12/4/2026)" required> <br><br>
-            <input type="number" id="newMonths" placeholder="عدد الشهور" required> <br><br>
+            <label>الاسم الكامل:</label><br>
+            <input type="text" id="newName" placeholder="الاسم الكامل" style="width: 90%;"><br><br>
             
-            <button type="button" id="saveBtn" onclick="saveData()">حفظ (إضافة / تعديل)</button>
+            <label>آخر شهر دفع:</label><br>
+            <input type="text" id="newDate" placeholder="مثال: 12/4/2026" style="width: 90%;"><br><br>
+            
+            <label>عدد الشهور:</label><br>
+            <input type="number" id="newMonths" placeholder="عدد الشهور" style="width: 90%;"><br><br>
+            
+            <button type="button" id="saveBtn" onclick="saveData()">حفظ البيانات</button>
             <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">إلغاء التعديل</button>
         </fieldset>
 
-        <h3>جدول التحكم بالبيانات</h3>
+        <h3>جدول بيانات المشتركين</h3>
         <table border="1" cellpadding="8" cellspacing="0" width="100%" style="background: #fff;">
             <thead>
                 <tr bgcolor="#ddd">
                     <th>الاسم</th>
                     <th>آخر شهر دفع</th>
                     <th>عدد الشهور</th>
-                    <th>التحكم</th>
                 </tr>
-               <tr>
-                <th>محمود القلقيلي</th>
-                <th>11/1/2026</th>
-                <th>7</th>
-               </tr>
+                <tr>
+                    <th>ll</th>
+                    <th>22/6/2026</th>
+                    <th>2</th>
+                </tr>
             </thead>
             <tbody id="adminTableBody">
                 <!-- تحميل البيانات تلقائياً من Firebase -->
             </tbody>
         </table>
+        <br>
+        <button onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- واجهة المستخدم -->
+    <!-- 3. واجهة المستخدم -->
     <div id="userView" style="display: none;">
-        <h3>صفحة المستخدم</h3>
+        <h3>صفحة المشتركين (عرض فقط)</h3>
         <table border="1" width="100%" cellpadding="8" cellspacing="0" style="background: #fff;">
             <thead>
                 <tr bgcolor="#eee">
@@ -76,17 +82,19 @@
                 </tr>
             </thead>
             <tbody id="userTableBody">
-                <!-- تحميل البيانات تلقائياً من Firebase -->
+                <!-- تحميل البيانات من Firebase -->
             </tbody>
         </table>
+        <br>
+        <button onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- 1. مكتبات Firebase الأساسية -->
+    <!-- 4. مكتبات Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // 2. ضَع مفاتيح مشروعك من Firebase Console هنا:
+        // ⚠️ استبدل المفاتيح ببيانات مشروعك من Firebase Console
         const firebaseConfig = {
             apiKey: "ضع_الـ_apiKey_هنا",
             authDomain: "PROJECT_ID.firebaseapp.com",
@@ -97,11 +105,9 @@
             appId: "XXXXX"
         };
 
-        // تهيئة الاتصال بقاعدة البيانات
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // فحص الدخول
         function check() {
             var u = document.getElementById("username").value.trim();
             var p = document.getElementById("pass").value.trim();
@@ -109,19 +115,17 @@
             if (u === "admin" && p === "1234") {
                 document.getElementById("myForm").style.display = "none";
                 document.getElementById("adminView").style.display = "block";
-                document.getElementById("userView").style.display = "none";
-                loadDataFromFirebase(true); // جلب البيانات لوجهة الأدمن
+                loadAdminData();
             } else if (u === "user" && p === "1122") {
                 document.getElementById("myForm").style.display = "none";
                 document.getElementById("userView").style.display = "block";
-                document.getElementById("adminView").style.display = "none";
-                loadDataFromFirebase(false); // جلب البيانات لوجهة المستخدم
+                loadUserData();
             } else {
-                alert("البيانات غير صحيحة!");
+                alert("بيانات الدخول غير صحيحة!");
             }
         }
 
-        // دالة حفظ البيانات (إضافة جديدة أو تعديل) في Firebase
+        // --- دالة الحفظ (إضافة جديدة أوتعديل سطر قائم) ---
         function saveData() {
             var key = document.getElementById("editKey").value;
             var name = document.getElementById("newName").value.trim();
@@ -133,31 +137,74 @@
                 return;
             }
 
-            var itemData = {
-                name: name,
-                date: date,
-                months: months
-            };
+            var itemData = { name: name, date: date, months: months };
 
-            if (key) {
-                // تعديل سطر موجود أصلاً
-                database.ref('subscribers/' + key).update(itemData).then(() => {
-                    alert("تم تعديل البيانات في Firebase بنجاح!");
-                    resetForm();
+            if (key !== "") {
+                // تعديل مباشر بالـ key
+                database.ref('subscribers/' + key).update(itemData, function(error) {
+                    if (error) {
+                        alert("حدث خطأ أثناء التعديل: " + error.message);
+                    } else {
+                        alert("تم تعديل البيانات بنجاح!");
+                        resetForm();
+                    }
                 });
             } else {
-                // إضافة مشترك جديد
-                database.ref('subscribers/').push(itemData).then(() => {
-                    alert("تم حفظ المشترك في Firebase بنجاح!");
-                    resetForm();
+                // إضافة جديدة
+                database.ref('subscribers/').push(itemData, function(error) {
+                    if (error) {
+                        alert("حدث خطأ أثناء الإضافة: " + error.message);
+                    } else {
+                        alert("تمت الإضافة بنجاح!");
+                        resetForm();
+                    }
                 });
             }
         }
 
-        // دالة قراءة وتحديث الجدول فوراً من Firebase
-        function loadDataFromFirebase(isAdmin) {
+        // --- دالة جلب بيانات سطر محدد وتعبئتها في الخانات فوق للتعديل ---
+        function prepareEdit(key) {
+            database.ref('subscribers/' + key).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    document.getElementById("editKey").value = key;
+                    document.getElementById("newName").value = data.name;
+                    document.getElementById("newDate").value = data.date;
+                    document.getElementById("newMonths").value = data.months;
+
+                    document.getElementById("formTitle").innerHTML = "<b>تعديل بيانات: " + data.name + "</b>";
+                    document.getElementById("saveBtn").innerText = "حفظ التعديلات";
+                    document.getElementById("cancelBtn").style.display = "inline-block";
+                    
+                    // التمرير لأعلى الصفحة للتركيز على الخانات
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        }
+
+        // --- دالة الحذف ---
+        function deleteRow(key) {
+            if (confirm("هل أنت متأكد من الحذف؟")) {
+                database.ref('subscribers/' + key).remove();
+            }
+        }
+
+        // --- تفريغ الخانات ---
+        function resetForm() {
+            document.getElementById("editKey").value = "";
+            document.getElementById("newName").value = "";
+            document.getElementById("newDate").value = "";
+            document.getElementById("newMonths").value = "";
+
+            document.getElementById("formTitle").innerHTML = "<b>إضافة / تعديل مشترك</b>";
+            document.getElementById("saveBtn").innerText = "حفظ البيانات";
+            document.getElementById("cancelBtn").style.display = "none";
+        }
+
+        // --- تحميل جدول الأدمن ---
+        function loadAdminData() {
             database.ref('subscribers/').on('value', (snapshot) => {
-                const tbody = document.getElementById(isAdmin ? "adminTableBody" : "userTableBody");
+                const tbody = document.getElementById("adminTableBody");
                 tbody.innerHTML = "";
 
                 if (snapshot.exists()) {
@@ -165,61 +212,51 @@
                         const key = childSnapshot.key;
                         const data = childSnapshot.val();
 
-                        if (isAdmin) {
-                            tbody.innerHTML += `<tr>
-                                <td>${data.name}</td>
-                                <td>${data.date}</td>
-                                <td>${data.months}</td>
-                                <td>
-                                    <button onclick="editRow('${key}', '${data.name}', '${data.date}', '${data.months}')">تعديل ✏️</button>
-                                    <button onclick="deleteRow('${key}')">حذف ❌</button>
-                                </td>
-                            </tr>`;
-                        } else {
-                            tbody.innerHTML += `<tr>
-                                <td>${data.name}</td>
-                                <td>${data.date}</td>
-                                <td>${data.months}</td>
-                            </tr>`;
-                        }
+                        tbody.innerHTML += `<tr>
+                            <td><b>${data.name}</b></td>
+                            <td>${data.date}</td>
+                            <td>${data.months}</td>
+                            <td>
+                                <button type="button" onclick="prepareEdit('${key}')">تعديل ✏️</button>
+                                <button type="button" onclick="deleteRow('${key}')">حذف ❌</button>
+                            </td>
+                        </tr>`;
                     });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="${isAdmin ? 4 : 3}">لا توجد بيانات حالياً</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4">لا توجد بيانات حالياً</td></tr>`;
                 }
             });
         }
 
-        // تحضير الخانات لتعديل السطر
-        function editRow(key, name, date, months) {
-            document.getElementById("editKey").value = key;
-            document.getElementById("newName").value = name;
-            document.getElementById("newDate").value = date;
-            document.getElementById("newMonths").value = months;
+        // --- تحميل جدول المستخدم ---
+        function loadUserData() {
+            database.ref('subscribers/').on('value', (snapshot) => {
+                const tbody = document.getElementById("userTableBody");
+                tbody.innerHTML = "";
 
-            document.getElementById("formTitle").innerText = "تعديل بيانات: " + name;
-            document.getElementById("saveBtn").innerText = "حفظ التعديلات";
-            document.getElementById("cancelBtn").style.display = "inline-block";
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        tbody.innerHTML += `<tr>
+                            <td><b>${data.name}</b></td>
+                            <td>${data.date}</td>
+                            <td>${data.months}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات حالياً</td></tr>`;
+                }
+            });
         }
 
-        // حذف من قاعدة البيانات
-        function deleteRow(key) {
-            if (confirm("هل أنت متأكد من الحذف؟")) {
-                database.ref('subscribers/' + key).remove();
-            }
-        }
-
-        // إعادة تصفير النموذج
-        function resetForm() {
-            document.getElementById("editKey").value = "";
-            document.getElementById("newName").value = "";
-            document.getElementById("newDate").value = "";
-            document.getElementById("newMonths").value = "";
-
-            document.getElementById("formTitle").innerText = "إضافة / تعديل مشترك";
-            document.getElementById("saveBtn").innerText = "حفظ (إضافة / تعديل)";
-            document.getElementById("cancelBtn").style.display = "none";
+        // --- تسجيل الخروج ---
+        function logout() {
+            document.getElementById("adminView").style.display = "none";
+            document.getElementById("userView").style.display = "none";
+            document.getElementById("myForm").style.display = "block";
+            document.getElementById("username").value = "";
+            document.getElementById("pass").value = "";
         }
     </script>
-
 </body>
 </html>
