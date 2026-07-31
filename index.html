@@ -29,12 +29,37 @@
     <!-- واجهة الأدمن -->
     <div id="adminView" style="display: none;">
         <h3>صفحة الأدمن</h3>
-        <table border="1" width="400">
-            <tr><th>الاسم</th><th>الحالة</th></tr>
-            <tr><td>محمود سليمان القليلي</td><td>أدمن</td></tr>
+       <fieldset style="width: 400px; margin-bottom: 20px;">
+            <legend id="formTitle">إضافة / تعديل مشترك</legend>
+            <!-- معرف سري للسطر الجاري تعديله -->
+            <input type="hidden" id="editKey"> 
+            
+            <input type="text" id="newName" placeholder="الاسم الكامل" required> <br><br>
+            <input type="text" id="newDate" placeholder="آخر شهر دفع (مثال: 12/4/2026)" required> <br><br>
+            <input type="number" id="newMonths" placeholder="عدد الشهور" required> <br><br>
+            
+            <button type="button" id="saveBtn" onclick="saveData()">إضافة إلى قاعدة البيانات</button>
+            <button type="button" id="cancelBtn" onclick="resetForm()" style="display:none;">إلغاء التعديل</button>
+        </fieldset>
+
+        <h3>جدول التحكم بالبيانات</h3>
+        <table border="1" cellpadding="8" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>آخر شهر دفع</th>
+                    <th>عدد الشهور</th>
+                    <th>إجراءات الأدمن</th>
+                </tr>
+                <tr>
+            <th> محمود القلقيلي</th>
+                </tr>
+            </thead>
+            <tbody id="adminTableBody">
+                <!-- تحميل البيانات تلقائياً -->
+            </tbody>
         </table>
     </div>
-
     <!-- واجهة المستخدم -->
     <div id="userView" style="display: none;">
         <h3>صفحة المستخدم</h3>
