@@ -67,7 +67,11 @@
             <tbody id="adminTableBody"></tbody>
         </table>
         <br>
+        <fieldset><legend><b>الاعلانات </b></legend>
+         
+        </fieldset> 
         <button class="btn-cancel" onclick="logout()">تسجيل الخروج</button>
+       
     </div>
 
     <!-- 3. واجهة المستخدم -->
@@ -80,12 +84,14 @@
             <tbody id="userTableBody"></tbody>
         </table>
         <br>
+               <fieldset><legend><b>الاعلانات </b></legend></fieldset> 
+
         <button class="btn-cancel" onclick="logout()">تسجيل الخروج</button>
     </div>
 
     <script>
         // إعدادات البيانات الأولية في المتصفح
-        let columns = JSON.parse(localStorage.getItem('my_columns')) || ["الاسم", "آخر شهر دفع", "عدد الشهور"];
+        let columns = JSON.parse(localStorage.getItem('my_columns')) || ["الاسم", "آخر شهر دفع", "عدد الشهور الغير مدفوعة"];
         let rows = JSON.parse(localStorage.getItem('my_rows')) || [
             {"الاسم": "أحمد محمود", "آخر شهر دفع": "04/2026", "عدد الشهور": "3"},
             {"الاسم": "محمد علي", "آخر شهر دفع": "05/2026", "عدد الشهور": "1"}
